@@ -16,8 +16,8 @@ module.exports = {
       name: '@electron-forge/maker-squirrel',
       config: {
         // ------ Windows 代码签名 start-------
-        certificateFile: './cert.pfx',
-        certificatePassword: process.env.CERTIFICATE_PASSWORD,
+        // certificateFile: './cert.pfx',
+        // certificatePassword: process.env.CERTIFICATE_PASSWORD,
         // ------ Windows 代码签名 end-------
       },
     },

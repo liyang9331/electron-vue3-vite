@@ -17,10 +17,21 @@ const path = require('path')
  * createWindow() 函数将您的页面加载到新的 BrowserWindow 实例中
  */
 const createWindow = () => {
+    /**
+     * 主进程的主要目的是使用 BrowserWindow 模块创建和管理应用程序窗口。
+     * BrowserWindow 类的每个实例创建一个应用程序窗口，且在单独的渲染器进程中加载一个网页。 
+     * 您可从主进程用 window 的 webContent 对象与网页内容进行交互。
+     */
+    // const win1 = new BrowserWindow({ width: 800, height: 800 })//当一个 BrowserWindow 实例被销毁时，与其相应的渲染器进程也会被终止。
+    // win1.loadURL("https://github.com")
+
+
     const win = new BrowserWindow({
         width: 800,
         height: 600,
-        //为了将脚本附在渲染进程上，在 BrowserWindow 构造器中使用 webPreferences.preload 传入脚本的路径。
+        /**
+         * 为了将脚本附在渲染进程上，在 BrowserWindow 构造器中使用 webPreferences.preload 传入脚本的路径。
+         */
         webPreferences: {
             /**
              * __dirname 字符串指向当前正在执行脚本的路径 (在本例中，它指向你的项目的根文件
