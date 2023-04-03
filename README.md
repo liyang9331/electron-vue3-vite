@@ -1,7 +1,8 @@
-# Vue 3 + Typescript + Vite2 + Pinia2
+# Electron + Vue 3 + Typescript + Vite2 + Pinia2
 
 ## Depends
 
+- [Electron 23.x](https://www.electronjs.org/zh/)
 - [Vue 3.x](https://github.com/vuejs/vue-next)
 - [Vue-Router 4.x](https://github.com/vuejs/vue-router-next)
 - [Pinia2](https://github.com/posva/pinia/) - manage state instead of vuex
@@ -13,9 +14,8 @@
 
 ## Installation
 
-1. Clone repository `git clone https://github.com/nabaonan/todos-action.git `
-2. `cd vue-vite-ts-setup`
-3. `yarn` or `npm i`
+1. Clone repository `git clone https://github.com/liyang9331/electron-vue3-ts-vite-tmp.git `
+2. `yarn` or `npm i`
 
 ## Usage
 
