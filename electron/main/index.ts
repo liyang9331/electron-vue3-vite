@@ -1,35 +1,134 @@
-// electron/main/index.ts
-import { app, BrowserWindow } from "electron";
-import path from "path";
+import { app, BrowserWindow, shell, ipcMain,Notification } from 'electron'
+import { release } from 'node:os'
+import { join } from 'node:path'
 
-const createWindow = () => {
-  const win = new BrowserWindow({
+// The built directory structure
+//
+// ├─┬ dist-electron
+// │ ├─┬ main
+// │ │ └── index.js    > Electron-Main
+// │ └─┬ preload
+// │   └── index.js    > Preload-Scripts
+// ├─┬ dist
+// │ └── index.html    > Electron-Renderer
+//
+process.env.DIST_ELECTRON = join(__dirname, '..')
+process.env.DIST = join(process.env.DIST_ELECTRON, '../dist')
+process.env.PUBLIC = process.env.VITE_DEV_SERVER_URL
+  ? join(process.env.DIST_ELECTRON, '../public')
+  : process.env.DIST
+
+// Disable GPU Acceleration for Windows 7
+if (release().startsWith('6.1')) app.disableHardwareAcceleration()
+
+// Set application name for Windows 10+ notifications
+if (process.platform === 'win32') app.setAppUserModelId(app.getName())
+
+if (!app.requestSingleInstanceLock()) {
+  app.quit()
+  process.exit(0)
+}
+
+// Remove electron security warnings
+// This warning only shows in development mode
+// Read more on https://www.electronjs.org/docs/latest/tutorial/security
+// process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
+
+let win: BrowserWindow | null = null
+// Here, you can also use other preload
+const preload = join(__dirname, '../preload/index.js')
+const url = process.env.VITE_DEV_SERVER_URL
+const indexHtml = join(process.env.DIST, 'index.html')
+
+async function createWindow() {
+  win = new BrowserWindow({
+    title: 'Main window',
+    width:1500,
+    icon: join(process.env.PUBLIC, 'favicon.ico'),
     webPreferences: {
-      contextIsolation: false, // 是否开启隔离上下文
-      nodeIntegration: true, // 渲染进程使用Node API
-      preload: path.join(__dirname, "../electron/preload/index.js"), // 需要引用js文件
+      preload,
+      // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
+      // 警告：启用 nodeIntegration 和禁用 contextIsolation 在生产中不安全
+      // Consider using contextBridge.exposeInMainWorld
+      // Read more on https://www.electronjs.org/docs/latest/tutorial/context-isolation
+      // nodeIntegration: true,//关闭隔离
+      // contextIsolation: false,
     },
-  });
+  })
 
-  // 如果打包了，渲染index.html
-  if (app.isPackaged) {
-    win.loadFile(path.join(__dirname, "../index.html"));
+  if (process.env.VITE_DEV_SERVER_URL) { // electron-vite-vue#298
+    win.loadURL(url)
+    // Open devTool if the app is not packaged
+    win.webContents.openDevTools()
   } else {
-    const url = "http://localhost:3000"; // 本地启动的vue项目路径
-    win.loadURL(url);
+    win.loadFile(indexHtml)
   }
-};
 
-app.whenReady().then(() => {
-  createWindow(); // 创建窗口
-  app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
-  });
-});
+  // Test actively push message to the Electron-Renderer
+  win.webContents.on('did-finish-load', () => {
+    win?.webContents.send('main-process-message', new Date().toLocaleString())
+  })
 
-// 关闭窗口
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app.quit();
+  // Make all links open with the browser, not with the application
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith('https:')) shell.openExternal(url)
+    return { action: 'deny' }
+  })
+  // win.webContents.on('will-navigate', (event, url) => { }) #344
+}
+
+app.whenReady().then(createWindow)
+
+app.on('window-all-closed', () => {
+  win = null
+  if (process.platform !== 'darwin') app.quit()
+})
+
+app.on('second-instance', () => {
+  if (win) {
+    // Focus on the main window if the user tried to open another
+    if (win.isMinimized()) win.restore()
+    win.focus()
   }
-});
+})
+
+app.on('activate', () => {
+  const allWindows = BrowserWindow.getAllWindows()
+  if (allWindows.length) {
+    allWindows[0].focus()
+  } else {
+    createWindow()
+  }
+})
+
+// New window example arg: new windows url
+ipcMain.handle('open-win', (event, arg) => {
+  const childWindow = new BrowserWindow({
+    webPreferences: {
+      preload,
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
+  })
+
+  if (process.env.VITE_DEV_SERVER_URL) {
+    childWindow.loadURL(`${url}#${arg}`)
+  } else {
+    childWindow.loadFile(indexHtml, { hash: arg })
+  }
+})
+
+// 打开新窗口加载指定网页
+ipcMain.handle('open-web', (event, url) => {
+  console.log(url)
+  new Notification({title:"网址",body:url}).show();
+  const childWindow = new BrowserWindow({
+    webPreferences: {
+      preload,
+      // nodeIntegration: true,
+      // contextIsolation: false,
+    },
+  })
+
+  childWindow.loadURL(`${url}`)
+})

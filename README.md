@@ -1,37 +1,71 @@
-# Electron + Vue 3 + Typescript + Vite2 + Pinia2
+# electron-vite-vue
 
-## Depends
+🥳 Really simple `Electron` + `Vue` + `Vite` boilerplate.
 
-- [Electron 23.x](https://www.electronjs.org/zh/)
-- [Vue 3.x](https://github.com/vuejs/vue-next)
-- [Vue-Router 4.x](https://github.com/vuejs/vue-router-next)
-- [Pinia2](https://github.com/posva/pinia/) - manage state instead of vuex
-- [Ant Design Vue 2.x](https://github.com/vueComponent/ant-design-vue)
-- [Element-Plus](https://github.com/element-plus/element-plus) 
-- [Naive UI](https://github.com/TuSimple/naive-ui)
-- [unplugin-vue-components](https://github.com/antfu/unplugin-vue-components) - a vite plugin can auto import ui library on demand
-- TypeScript, of course
+<!-- [![awesome-vite](https://awesome.re/mentioned-badge.svg)](https://github.com/vitejs/awesome-vite) -->
+<!-- [![Netlify Status](https://api.netlify.com/api/v1/badges/ae3863e3-1aec-4eb1-8f9f-1890af56929d/deploy-status)](https://app.netlify.com/sites/electron-vite/deploys) -->
+<!-- [![GitHub license](https://img.shields.io/github/license/caoxiemeihao/electron-vite-vue)](https://github.com/electron-vite/electron-vite-vue/blob/main/LICENSE) -->
+<!-- [![GitHub stars](https://img.shields.io/github/stars/caoxiemeihao/electron-vite-vue?color=fa6470)](https://github.com/electron-vite/electron-vite-vue) -->
+<!-- [![GitHub forks](https://img.shields.io/github/forks/caoxiemeihao/electron-vite-vue)](https://github.com/electron-vite/electron-vite-vue) -->
+[![GitHub Build](https://github.com/electron-vite/electron-vite-vue/actions/workflows/build.yml/badge.svg)](https://github.com/electron-vite/electron-vite-vue/actions/workflows/build.yml)
+[![GitHub Discord](https://img.shields.io/badge/chat-discord-blue?logo=discord)](https://discord.gg/sRqjYpEAUK)
 
-## Installation
+## Features
 
-1. Clone repository `git clone https://github.com/liyang9331/electron-vue3-ts-vite-tmp.git `
-2. `yarn` or `npm i`
+📦 Out of the box  
+🎯 Based on the official [template-vue-ts](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-vue-ts), less invasive  
+🌱 Extensible, really simple directory structure  
+💪 Support using Node.js API in Electron-Renderer  
+🔩 Support C/C++ native addons  
+🖥 It's easy to implement multiple windows  
 
-## Usage
+## Quick Start
 
-1. Run `yarn`
-2. `yarn dev`
+```sh
+npm create electron-vite
+```
 
-## Build
+<!-- [![quick-start](https://asciinema.org/a/483731.svg)](https://asciinema.org/a/483731) -->
 
-Run `yarn build`
+![electron-vite-vue.gif](/public/electron-vite-vue.gif)
 
-## Preview
+## Debug
 
+![electron-vite-react-debug.gif](https://github.com/electron-vite/electron-vite-react/blob/main/public/electron-vite-react-debug.gif?raw=true)
 
+## Directory
 
-![](../assets/vue-vite-ts-setup/1.png)
+```diff
++ ├─┬ electron
++ │ ├─┬ main
++ │ │ └── index.ts    entry of Electron-Main
++ │ └─┬ preload
++ │   └── index.ts    entry of Preload-Scripts
+  ├─┬ src
+  │ └── main.ts       entry of Electron-Renderer
+  ├── index.html
+  ├── package.json
+  └── vite.config.ts
+```
 
-![](../assets/vue-vite-ts-setup/2.png)
+## Be aware
 
-![](../assets/vue-vite-ts-setup/3.png)
+🚨 By default, this template integrates Node.js in the Renderer process. If you don't need it, you just remove the option below. [Because it will modify the default config of Vite](https://github.com/electron-vite/vite-plugin-electron-renderer#config-presets-opinionated).
+
+```diff
+# vite.config.ts
+
+export default {
+  plugins: [
+-   // Use Node.js API in the Renderer-process
+-   renderer({
+-     nodeIntegration: true,
+-   }),
+  ],
+}
+```
+
+## FAQ
+
+- [dependencies vs devDependencies](https://github.com/electron-vite/vite-plugin-electron-renderer#dependencies-vs-devdependencies)
+- [C/C++ addons, Node.js modules - Pre-Bundling](https://github.com/electron-vite/vite-plugin-electron-renderer#dependency-pre-bundling)

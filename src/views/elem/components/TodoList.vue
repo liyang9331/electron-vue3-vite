@@ -92,5 +92,5 @@
 </script>
 
 <style scoped lang="less">
-  @import url("../../common/TodoList.less");
+  @import url("../TodoList.less");
 </style>

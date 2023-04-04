@@ -1,3 +1,5 @@
-// electron/preload/index.ts
-import os from "os";
-console.log("platform", os.platform());
+const {contextBridge,ipcRenderer} = require('electron')
+
+contextBridge.exposeInMainWorld('electronAPI',{
+  openWeb:(url)=> ipcRenderer.send('open-web',url)
+})
