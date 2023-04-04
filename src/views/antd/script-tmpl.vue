@@ -9,12 +9,11 @@
   <TodoTable :data="unfinish" @deleteItem="deleteItem" />
   <a-divider orientation="left">已完成</a-divider>
   <!-- <TodoList :data="finishes" @on-delete-item="deleteItem" /> -->
-  <TodoTable :data="finishes" @delete-item="deleteItem" />
+  <TodoTable :data="finishes" @deleteItem="deleteItem" />
 </template>
 
 <script setup lang="ts">
 import AddForm from "./components/AddForm.vue";
-
 
 import type { DataItem } from "@/types/model";
 import { useTodo } from "@/hooks/useTodo";

@@ -3,6 +3,7 @@
     "target": "esnext",
     "module": "esnext",
     "moduleResolution": "node",
+    //如果你正在使用选项式 API，需要将 compilerOptions.strict 设置为 true (或者至少开启 compilerOptions.noImplicitThis，它是 strict 模式的一部分)，才可以获得对组件选项中 this 的类型检查。否则 this 会被认为是 any。
     "strict": true,
     "jsx": "preserve",
     "sourceMap": true,
@@ -11,9 +12,11 @@
     "lib": ["esnext", "dom"],
     "types": ["vite/client"],
     "baseUrl": "src",
+    //如果你在构建工具中配置了路径解析别名，例如 @/* 这个别名被默认配置在了 create-vue 项目中，你需要通过 compilerOptions.paths 选项为 TypeScript 再配置一遍。
     "paths": {
       "@/*": ["./*"]
     },
+    "isolatedModules":true,//应当设置为 true，因为 Vite 使用 esbuild 来转译 TypeScript，并受限于单文件转译的限制。
     "skipLibCheck": true,
     "noImplicitAny": true, //不允许使用any
     // "strictNullChecks": true, //不允许使用null
