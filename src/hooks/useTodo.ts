@@ -7,7 +7,7 @@ import { useDelete } from "./useDelete";
 import { useEdit } from "./useEdit";
 
 import { mapState } from "pinia";
-import { StoreKey } from "@/enums/localStore";
+// import { StoreKey } from "@/enums/localStore";
 
 export function useTodo() {
   const todoStore = useTodoStore();
@@ -23,7 +23,7 @@ export function useTodo() {
 
   watch(todoStore.total, total => {
     console.log("store拦截器");
-    localStorage.setItem(StoreKey.TODO_LIST, JSON.stringify(total));
+    // localStorage.setItem(StoreKey.TODO_LIST, JSON.stringify(total));
   });
 
   const clearAll = () => {

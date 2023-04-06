@@ -3,7 +3,7 @@
  * 主进程在 Node.js 环境中运行，这意味着它具有 require 模块和使用所有 Node.js API 的能力。
  */
 
-import { app, BrowserWindow, shell, ipcMain, Notification,dialog,session } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, Notification, dialog, session } from 'electron'
 import { release } from 'node:os'
 import { join } from 'node:path'
 
@@ -46,7 +46,7 @@ const url = process.env.VITE_DEV_SERVER_URL
 const indexHtml = join(process.env.DIST, 'index.html')
 
 async function handleFileOpen() {
-  const { canceled, filePaths } = await dialog.showOpenDialog()
+  const { canceled, filePaths } = await dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] });
   if (canceled) {
     return
   } else {
@@ -59,11 +59,11 @@ function createWindow() {
     title: 'Main window',
     width: 1500,
     icon: join(process.env.PUBLIC, 'favicon.ico'),
-    autoHideMenuBar:true,//隐藏菜单
+    autoHideMenuBar: true,//隐藏菜单
     webPreferences: {
       //预加载脚本可以在 BrowserWindow 构造方法中的 webPreferences 选项里被附加到主进程。
       preload,
-      webSecurity:false,//关闭web权限检查，允许跨域
+      webSecurity: false,//关闭web权限检查，允许跨域
       // Read more on https://www.electronjs.org/zh/blog/electron-4-0#webpreferences-default-values
       nodeIntegration: false,//预加载脚本的渲染器是否启用沙盒-默认启用
       contextIsolation: true,//是否开启上下文隔离-默认开启
@@ -106,15 +106,15 @@ function createWindow() {
     childWindow.loadURL(`${url}`)
   })
 
-    /**
-   * IPC：渲染器进程到主进程（双向）
-   */
-    ipcMain.handle('dialog:openFile',handleFileOpen)
+  /**
+ * IPC：渲染器进程到主进程（双向）
+ */
+  ipcMain.handle('dialog:openFile', handleFileOpen)
 }
 
 app.whenReady().then(createWindow)
 
-app.on('ready',()=>{
+app.on('ready', () => {
   // const filter = {urls:['*://*/*']}
   // session.defaultSession.webRequest.onBeforeSendHeaders(filter,(details,callback)=>{
   //   details.requestHeaders['Origin']='*'

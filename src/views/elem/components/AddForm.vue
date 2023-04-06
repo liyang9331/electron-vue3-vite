@@ -24,7 +24,7 @@
 
   export default defineComponent({
     emits: {
-      formSubmit: formState => {
+      formSubmit: (formState: any) => {
         return { ...toRaw(formState) };
       },
     },

@@ -1,4 +1,4 @@
-import { StoreKey } from "@/enums/localStore";
+// import { StoreKey } from "@/enums/localStore";
 import { DataItem } from "@/types/model";
 import { getUUID } from "@/utils";
 
@@ -39,10 +39,10 @@ export const useTodoStore = defineStore('todo',{
     },
 
     restoreData() {
-      const totalStr = localStorage.getItem(StoreKey.TODO_LIST);
-      if (totalStr) {
-        this.total = JSON.parse(totalStr);
-      }
+      // const totalStr = localStorage.getItem(StoreKey.TODO_LIST);
+      // if (totalStr) {
+      //   this.total = JSON.parse(totalStr);
+      // }
     },
   },
 });
