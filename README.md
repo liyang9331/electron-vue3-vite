@@ -1,6 +1,6 @@
 # electron-vite-vue
 
-🥳 Really simple `Electron` + `Vue` + `Vite` boilerplate.
+🥳 Really simple `Electron` + `Vue` + `Vite` + `Element-Plus` boilerplate.
 
 <!-- [![awesome-vite](https://awesome.re/mentioned-badge.svg)](https://github.com/vitejs/awesome-vite) -->
 <!-- [![Netlify Status](https://api.netlify.com/api/v1/badges/ae3863e3-1aec-4eb1-8f9f-1890af56929d/deploy-status)](https://app.netlify.com/sites/electron-vite/deploys) -->

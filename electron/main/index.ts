@@ -1,4 +1,9 @@
-import { app, BrowserWindow, shell, ipcMain,Notification } from 'electron'
+/**
+ * electron 主进程
+ * 主进程在 Node.js 环境中运行，这意味着它具有 require 模块和使用所有 Node.js API 的能力。
+ */
+
+import { app, BrowserWindow, shell, ipcMain, Notification,dialog,session } from 'electron'
 import { release } from 'node:os'
 import { join } from 'node:path'
 
@@ -40,19 +45,28 @@ const preload = join(__dirname, '../preload/index.js')
 const url = process.env.VITE_DEV_SERVER_URL
 const indexHtml = join(process.env.DIST, 'index.html')
 
-async function createWindow() {
+async function handleFileOpen() {
+  const { canceled, filePaths } = await dialog.showOpenDialog()
+  if (canceled) {
+    return
+  } else {
+    return filePaths[0]
+  }
+}
+
+function createWindow() {
   win = new BrowserWindow({
     title: 'Main window',
-    width:1500,
+    width: 1500,
     icon: join(process.env.PUBLIC, 'favicon.ico'),
+    autoHideMenuBar:true,//隐藏菜单
     webPreferences: {
+      //预加载脚本可以在 BrowserWindow 构造方法中的 webPreferences 选项里被附加到主进程。
       preload,
-      // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
-      // 警告：启用 nodeIntegration 和禁用 contextIsolation 在生产中不安全
-      // Consider using contextBridge.exposeInMainWorld
-      // Read more on https://www.electronjs.org/docs/latest/tutorial/context-isolation
-      // nodeIntegration: true,//关闭隔离
-      // contextIsolation: false,
+      webSecurity:false,//关闭web权限检查，允许跨域
+      // Read more on https://www.electronjs.org/zh/blog/electron-4-0#webpreferences-default-values
+      nodeIntegration: false,//预加载脚本的渲染器是否启用沙盒-默认启用
+      contextIsolation: true,//是否开启上下文隔离-默认开启
     },
   })
 
@@ -75,9 +89,38 @@ async function createWindow() {
     return { action: 'deny' }
   })
   // win.webContents.on('will-navigate', (event, url) => { }) #344
+
+  /**
+   * IPC：渲染器进程到主进程（单向）
+   */
+  ipcMain.on('open-web', (event, url) => {
+    new Notification({ title: "网址", body: url }).show();
+    const childWindow = new BrowserWindow({
+      webPreferences: {
+        preload,
+        // nodeIntegration: true,
+        // contextIsolation: false,
+      },
+    })
+
+    childWindow.loadURL(`${url}`)
+  })
+
+    /**
+   * IPC：渲染器进程到主进程（双向）
+   */
+    ipcMain.handle('dialog:openFile',handleFileOpen)
 }
 
 app.whenReady().then(createWindow)
+
+app.on('ready',()=>{
+  // const filter = {urls:['*://*/*']}
+  // session.defaultSession.webRequest.onBeforeSendHeaders(filter,(details,callback)=>{
+  //   details.requestHeaders['Origin']='*'
+  //   callback({cancel:false,requestHeaders:details.requestHeaders})
+  // })
+})
 
 app.on('window-all-closed', () => {
   win = null
@@ -116,19 +159,4 @@ ipcMain.handle('open-win', (event, arg) => {
   } else {
     childWindow.loadFile(indexHtml, { hash: arg })
   }
-})
-
-// 打开新窗口加载指定网页
-ipcMain.handle('open-web', (event, url) => {
-  console.log(url)
-  new Notification({title:"网址",body:url}).show();
-  const childWindow = new BrowserWindow({
-    webPreferences: {
-      preload,
-      // nodeIntegration: true,
-      // contextIsolation: false,
-    },
-  })
-
-  childWindow.loadURL(`${url}`)
 })

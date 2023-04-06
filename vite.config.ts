@@ -61,9 +61,9 @@ export default defineConfig(({ command }) => {
       // Use Node.js API in the Renderer-process
       renderer(),
     ],
+    // 别名配置
     resolve:{
       alias:{
-        'src':path.resolve(__dirname,'src'),
         '@':path.resolve(__dirname,'src')
       }
     },

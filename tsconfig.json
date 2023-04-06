@@ -12,12 +12,18 @@
     "lib": ["ESNext", "DOM"],
     "skipLibCheck": true,
     "noEmit": true,
-    //如果你在构建工具中配置了路径解析别名，例如 @/* 这个别名被默认配置在了 create-vue 项目中，你需要通过 compilerOptions.paths 选项为 TypeScript 再配置一遍。
+    // 解析非相对模块的基础地址，默认是当前目录
+    "baseUrl": "./",
+    // 路径映射，相对于baseUrl
     "paths": {
-      "@": ["./src"],
-      "src":["./src"]
+      "@/*": ["./src/*"],
     }
   },
-  "include": ["src"],
+  //如果tsconfig.json中不存在“files”或“include”属性，则编译器默认将包含包含目录和子目录中的所有文件，但“exclude”指定的文件除外
+  
+  // 希望被编译的ts文件所在目录
+  "include": ["src","electron"],
+  // 不希望被编译的目录
+  "exclude": ["node_modules", "bower_components", "jspm_packages"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
