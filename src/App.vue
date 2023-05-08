@@ -1,5 +1,5 @@
 <template>
-  <layout-top @clickHandler="clickHandler()"></layout-top>
+  <!-- <layout-top @clickHandler="clickHandler()"></layout-top> -->
   <div class="app_page">
     <div class="app_content">
       <router-view></router-view>
@@ -15,8 +15,6 @@ import { useRouter } from "vue-router";
 import { receiveMessage, Socket } from "@/utils/websocket";
 import elcMessage from "@/components/message.vue";
 import loading from "@/components/loading.vue";
-import * as API from "@/api/index";
-import { da } from "element-plus/es/locale";
 const system = useMainStore();
 console.log(window)
 
@@ -26,37 +24,7 @@ function connect() {
   window.socket = new Socket({
     onmessage: (res: any) => {
       const data = receiveMessage(res);
-      if (data !== null && typeof (data) === 'string' && data.indexOf('{') !== -1) {
-        const ndata = JSON.parse(data)
-        if (ndata.code != 500 && ndata.code != 200) {
-          // 保存卡号
-          system.card.cardNumber = ndata.code;
-          system.card.insertCard = true;
-          system.card.isCardReading = false;
-          system.card.cardType = "E"
-          // 卡片类型【水卡：W,电卡：E】
-          API.queryCardInfo({ cardNo: system.card.cardNumber, cardType: system.card.cardType }).then((res: any) => {
-            // console.log(res)
-            system.card.cardInfo = res.result;
-          })
-            .catch((res) => { })
-            .finally(() => { });
-        } else if (ndata.code == 500) {
-
-          // 卡被拔出
-          if (system.card.insertCard === true) {
-            system.clearCardData();
-            const message = decodeURIComponent(ndata.message);
-            system.setMessage(message)
-            clickHandler()
-          } else {
-            system.card.isCardReading = false;
-            system.setMessage("请插卡")
-          }
-
-        }
-
-      }
+      //  todo....
     },
     onopen: (res: any) => {
       window.socket.onclose = (res: any) => {

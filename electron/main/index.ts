@@ -120,13 +120,13 @@ function createWindow() {
   const emptyIcon = nativeImage.createEmpty()
   win = new BrowserWindow({
     title: 'Main window',
-    show: false,
+    show: true,// 收否显示窗口
     // fullscreen:true,
     width: 1280,
     height:1024,
     // icon: join(process.env.PUBLIC, 'favicon.ico'),
     // icon: emptyIcon,// 设置为空字符串
-    autoHideMenuBar: true,//隐藏菜单
+    autoHideMenuBar: false,//置为 true 时，菜单栏会在窗口失去焦点时自动隐藏
     webPreferences: {
       //预加载脚本可以在 BrowserWindow 构造方法中的 webPreferences 选项里被附加到主进程。
       preload,

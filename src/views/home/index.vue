@@ -1,40 +1,27 @@
 <template>
-    <div class="page_title">
-        <p class="title">{{ title }}</p>
+    <div>
+        <a href="https://www.electronjs.org/" target="_blank">
+            <img src="@/assets/images/icon/electron-logo.svg" class="logo electron" alt="Electron logo" />
+        </a>
+        <a href="https://vitejs.dev/" target="_blank">
+            <img src="@/assets/images/icon/vite-logo.svg" class="logo" alt="Vite logo" />
+        </a>
+        <a href="https://vuejs.org/" target="_blank">
+            <img src="@/assets/images/icon/vue-logo.svg" class="logo vue" alt="Vue logo" />
+        </a>
+        <a href="https://element-plus.gitee.io/zh-CN/component/button.html" target="_blank">
+            <img src="@/assets/images/icon/element-plus-logo.svg" class="logo vue" alt="Vue logo" />
+        </a>
     </div>
-    <tips :message="cztips"></tips>
-    <div class="center">
-        <template v-for="(item, index) in list" :key="index">
-            <div class="card" @click="navigation(item)">
-                <img :src="item.bgi" style="width: 100%;height: 100%;">
-                <div class="card-body">
-                    <p class="card-text">{{ item.title }}</p>
-                    <img style="margin-top: 16%;" :src="item.icon"
-                        :style="{ width: '34%', height: 'auto' }" />
-                </div>
-            </div>
-        </template>
-        <!-- <template v-for="(item, index) in list" :key="index">
-            <el-col :span="6" class="card" v-if="index < 2" @click="navigation(item)">
-                <img :src="item.bgi" style="width: 100%;height: auto;">
-                <div class="card-body">
-                    <p class="card-text">{{ item.title }}</p>
-                    <img style="margin-top: 16%;" :src="item.icon"
-                        :style="{ width: index < 2 ? '34%' : '25%', height: 'auto' }" />
-                </div>
-            </el-col>
-        </template>
-        <el-col :span="6">
-            <template v-for="(item, index) in list" :key="index">
-                <div class="card" v-if="index >= 2" @click="navigation(item)">
-                    <img :src="item.bgi" style="width: 100%;height: auto;">
-                    <div class="card-body">
-                        <p class="card-text">{{ item.title }}</p>
-                        <img :src="item.icon" :style="{ width: index < 2 ? '34%' : '25%', height: 'auto' }" />
-                    </div>
-                </div>
-            </template>
-        </el-col> -->
+    <HelloWorld msg="Electron + Vite + Vue + Element-Plus" />
+    <!--  -->
+    <!-- <el-button class="elbutton" @click="navgiteto('/home')">page-home</el-button> -->
+    <el-button class="elbutton" @click="openWeb">在新窗口中打开百度</el-button>
+    <el-button class="elbutton" @click="openFile">打开文件</el-button>
+    文件路径：{{ filePath }}
+    <div class="flex-center">
+        Place static files into the <code>/public</code> folder
+        <img style="width:5em;" src="@/assets/images/icon/node-logo.svg" alt="Node logo">
     </div>
 </template>
   
@@ -52,64 +39,35 @@ import {
 import tips from "@/components/tips.vue"
 import { useMainStore } from "@/stores/index"
 import { useRoute, useRouter } from "vue-router";
-import * as API from "@/api/index"
 import { receiveMessage } from '@/utils/websocket'
-import df from "@/assets/images/df@2x.png"
-import bg2 from "@/assets/images/card-bg2@2x.png"
-import czjl from "@/assets/images/czjl@2x.png"
-import bg3 from "@/assets/images/card-bg3@2x.png"
-import qc from "@/assets/images/qc@2x.png"
-import bg4 from "@/assets/images/card-bg4@2x.png"
+import { rubbish } from "@/api/index"
 const system = useMainStore()
 system.viewName = "自助服务终端"
+
+// 设置基本数据类型时，使用 ref
+const filePath = ref<string>("")
+function navgiteto(key: string) {
+    router.push(key)
+}
+// 在新窗口打开网页
+function openWeb() {
+    window.electronAPI.openWeb("https://www.baidu.com")
+}
+// 选择文件，获取文件路径
+async function openFile() {
+    filePath.value = await window.electronAPI.openFile()
+}
+
+rubbish({ name: "香蕉" }).then((res: any) => {
+    console.log(res)
+})
 const route = useRoute();
 const router = useRouter();
-const title = ref<string>("欢迎使用智能一卡通充值服务系统");
-const cztips = "温馨提示：充值前请核对信息"
-let list = ref([
-    // { title: "水费充值", type: "water", icon: "./src/assets/images/sf@2x.png", bgi: "./src/assets/images/card-bg1@2x.png", w: 154, h: 154, navigation: "recharge" },
-    { title: "电费充值", type: "electricity", icon: df, bgi: bg2, w: 154, h: 154, navigation: "recharge" },
-    { title: "充值记录", type: "recharge", icon: czjl, bgi: bg3, w: 116, h: 116, navigation: "rechargeRecord" },
-    { title: "圈存", type: "coli", icon:qc, bgi: bg4, w: 116, h: 116, navigation: "coilCharging" },
-]);
 // console.log("00000")
 interface Nav {
     key: string;
     path: string;
     displayName: string;
-}
-function navigation(e: any) {
-    if (system.card.insertCard === true) {
-        router.push({ name: e.navigation, params: { type: e.type } })
-    } else {
-        // system.setMessage({ visible: true, message: '请插卡' })
-        let tout:any = null;
-        system.card.isCardReading = true;
-        API.cardRecognition({}).then((res: any) => {
-            const message = JSON.parse(res.message) || null;
-            const result = JSON.parse(res.result) || null;
-           
-            function stout (){
-                tout = setTimeout(()=>{
-                    if(system.card.cardNumber !== "" && system.card.insertCard === true){
-                        router.push({ name: e.navigation, params: { type: e.type } })
-                    }else{
-                        stout()
-                    }
-                },10)
-            }
-            stout()
-        }).catch(res => {
-            // system.setMessage('请插卡')
-        }).finally(() => {
-            // 超时关闭
-            setTimeout(() => {
-                system.card.isCardReading = false;
-                // system.setMessage({ visible: true, message: '超时请重试！'})
-                clearTimeout(tout)
-            }, 3000)
-        })
-    }
 }
 const navs: Nav[] = [
     {
@@ -121,58 +79,86 @@ const navs: Nav[] = [
 </script>
 
 <style lang="less" scoped>
-.page_title{
+.page_title {
     width: auto;
     height: auto;
 }
+.elbutton{
+    padding: 20px;
+    font-size: 35px;
+}
+.flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
+.logo {
+    height: 6em;
+    padding: 1.5em;
+    will-change: filter;
+    transition: filter 300ms;
+}
+
+.logo.electron:hover {
+    filter: drop-shadow(0 0 2em #9FEAF9);
+}
+
+.logo:hover {
+    filter: drop-shadow(0 0 2em #646cffaa);
+}
+
+.logo.vue:hover {
+    filter: drop-shadow(0 0 2em #42b883aa);
+}
 
 .center {
     margin-top: 40px;
     display: flex;
     width: 1430px;
     justify-content: space-between;
+
     .card {
-    width: 335px;
-    height: 500px;
-    // height: 100px;
-    // background-color: yellow;
-    position: relative;
-    cursor: pointer;
+        width: 335px;
+        height: 500px;
+        // height: 100px;
+        // background-color: yellow;
+        position: relative;
+        cursor: pointer;
 
-    & .card-body {
-        // position: relative;
-        position: absolute;
-        top: 0;
-        left: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 99;
-        width: 100%;
-        min-height: 100%;
-        flex-direction: column;
+        & .card-body {
+            // position: relative;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99;
+            width: 100%;
+            min-height: 100%;
+            flex-direction: column;
 
-        & .card-text {
-            text-align: center;
-            //             width: 192px;
-            // height: 48px;
-            font-size: 2rem;
-            font-family: Source Han Sans CN-Bold, Source Han Sans CN;
-            font-weight: bold;
-            color: #FFFFFF;
-            line-height: 0px;
-            text-shadow: 0px 3px 14px rgba(0, 0, 0, 0.16);
-            -webkit-background-clip: text;
-            // -webkit-text-fill-color: transparent;
-        }
+            & .card-text {
+                text-align: center;
+                //             width: 192px;
+                // height: 48px;
+                font-size: 2rem;
+                font-family: Source Han Sans CN-Bold, Source Han Sans CN;
+                font-weight: bold;
+                color: #FFFFFF;
+                line-height: 0px;
+                text-shadow: 0px 3px 14px rgba(0, 0, 0, 0.16);
+                -webkit-background-clip: text;
+                // -webkit-text-fill-color: transparent;
+            }
 
-        & .card-icon {
-            width: 20px;
-            height: 20px;
+            & .card-icon {
+                width: 20px;
+                height: 20px;
+            }
         }
     }
-}
 }
 
 // .tips {
