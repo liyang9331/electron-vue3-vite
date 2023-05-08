@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {Ref,ref,reactive} from "vue"
-import HelloWorld from '@/components/HelloWorld.vue'
+import HelloWorld from '@/components/layout-top.vue.js'
 import { useRouter } from "vue-router";
-import {rubbish} from "@/api/demo"
+import {rubbish} from "@/api/index"
 const router = useRouter()
 
 // 设置基本数据类型时，使用 ref

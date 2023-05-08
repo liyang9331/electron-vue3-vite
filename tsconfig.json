@@ -4,7 +4,9 @@
     "useDefineForClassFields": true,
     "module": "ESNext",
     "moduleResolution": "Node",
-    "strict": true,
+    "strict": true,//关闭ts类型检查
+    // "noImplicitAny": true,
+    // "noImplicitThis": true,
     "jsx": "preserve",
     "resolveJsonModule": true,
     "isolatedModules": true,

@@ -8,12 +8,13 @@
 /**
  * contextBridge 模块可以用来安全地从独立运行、上下文隔离的预加载脚本中暴露 API 给正在运行的渲染进程
  */
-const {contextBridge,ipcRenderer} = require('electron')
-
-contextBridge.exposeInMainWorld('electronAPI',{
+const { contextBridge, ipcRenderer } = require('electron')
+// const {app} = require('electron')
+// window.app = app
+contextBridge.exposeInMainWorld('electronAPI', {
   // IPC：渲染器进程到主进程（单向）
-  openWeb:(url:string)=> ipcRenderer.send('open-web',url),
+  openWeb: (url: string) => ipcRenderer.send('open-web', url),
+  exit: () => ipcRenderer.send('exit'),
   // IPC：渲染器进程到主进程（双向）
-  openFile:()=>ipcRenderer.invoke('dialog:openFile'),
-  desktop:true
+  openFile: () => ipcRenderer.invoke('dialog:openFile'),
 })

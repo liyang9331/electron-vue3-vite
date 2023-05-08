@@ -1,10 +1,123 @@
+<template>
+  <layout-top @clickHandler="clickHandler()"></layout-top>
+  <div class="app_page">
+    <div class="app_content">
+      <router-view></router-view>
+    </div>
+  </div>
+  <elcMessage v-if="system.message.visible"></elcMessage>
+  <loading v-if="system.card.isCardReading" title="读卡中..." message="正在读卡中，请勿取出卡片......"></loading>
+</template>
 <script setup lang="ts">
-console.log("[App.vue]", `Hello world from Electron!`)
+import layoutTop from "@/components/layout-top.vue";
+import { useMainStore } from "@/stores/index";
+import { useRouter } from "vue-router";
+import { receiveMessage, Socket } from "@/utils/websocket";
+import elcMessage from "@/components/message.vue";
+import loading from "@/components/loading.vue";
+import * as API from "@/api/index";
+import { da } from "element-plus/es/locale";
+const system = useMainStore();
+console.log(window)
+
+// 创建websocket连接,挂载到 window 对象下
+connect()
+function connect() {
+  window.socket = new Socket({
+    onmessage: (res: any) => {
+      const data = receiveMessage(res);
+      if (data !== null && typeof (data) === 'string' && data.indexOf('{') !== -1) {
+        const ndata = JSON.parse(data)
+        if (ndata.code != 500 && ndata.code != 200) {
+          // 保存卡号
+          system.card.cardNumber = ndata.code;
+          system.card.insertCard = true;
+          system.card.isCardReading = false;
+          system.card.cardType = "E"
+          // 卡片类型【水卡：W,电卡：E】
+          API.queryCardInfo({ cardNo: system.card.cardNumber, cardType: system.card.cardType }).then((res: any) => {
+            // console.log(res)
+            system.card.cardInfo = res.result;
+          })
+            .catch((res) => { })
+            .finally(() => { });
+        } else if (ndata.code == 500) {
+
+          // 卡被拔出
+          if (system.card.insertCard === true) {
+            system.clearCardData();
+            const message = decodeURIComponent(ndata.message);
+            system.setMessage(message)
+            clickHandler()
+          } else {
+            system.card.isCardReading = false;
+            system.setMessage("请插卡")
+          }
+
+        }
+
+      }
+    },
+    onopen: (res: any) => {
+      window.socket.onclose = (res: any) => {
+        // 断线重连
+        console.log('断线重连')
+        connect();
+      }
+    },
+    socketUrl: import.meta.env.VITE_SOCKET_URL,
+  }).websocket;
+}
+
+const router = useRouter();
+
+function clickHandler() {
+  // 返回主页
+  router.push({ name: "home" });
+}
 </script>
 
-<template>
-  <router-view></router-view>
-</template>
 
-<style>
+<style lang="less" scoped>
+.app_page {
+  height: calc(100% - 116px);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+</style>
+<style lang="less">
+html,
+body {
+  width: 100%;
+  height: 100%;
+}
+
+@font-face {
+  font-family: "Source Han Sans CN-Medium";
+  src: url("./assets/fonts/SourceHanSansSC-Medium.otf");
+}
+
+@font-face {
+  font-family: "Source Han Sans CN";
+  src: url("./assets/fonts/SourceHanSansSC-Normal.otf");
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+  background-image: url("./assets/images/app_bgi@2x.png");
+  background-size: cover;
+}
+
+body {
+  margin: 0;
+}
+
+.button_parent {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+}
 </style>

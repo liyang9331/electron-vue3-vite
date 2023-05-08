@@ -5,7 +5,7 @@ import vue from '@vitejs/plugin-vue'
 import electron from 'vite-plugin-electron'
 import renderer from 'vite-plugin-electron-renderer'
 import pkg from './package.json'
-
+import pxtoviewport from 'postcss-px-to-viewport'
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => {
   rmSync('dist-electron', { recursive: true, force: true })
@@ -75,5 +75,21 @@ export default defineConfig(({ command }) => {
       }
     })(),
     clearScreen: false,
+    css:{
+      postcss:{
+        plugins:[
+          pxtoviewport({
+            viewportWidth: 1920,
+            // viewportHeight: 667,
+            unitPrecision: 5,
+            viewportUnit: 'vw',
+            // selectorBlackList: ['.ignore'],
+          })
+        ]
+      }
+    },
+    build: {
+      assetsDir:''
+    },
   }
 })
