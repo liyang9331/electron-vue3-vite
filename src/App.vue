@@ -12,30 +12,42 @@
 import layoutTop from "@/components/layout-top.vue";
 import { useMainStore } from "@/stores/index";
 import { useRouter } from "vue-router";
-import { receiveMessage, Socket } from "@/utils/websocket";
+import WebSocketClient from "@/utils/websocket";
 import elcMessage from "@/components/message.vue";
 import loading from "@/components/loading.vue";
 const system = useMainStore();
-console.log(window)
+// console.log(window)
 
 // 创建websocket连接,挂载到 window 对象下
-connect()
-function connect() {
-  window.socket = new Socket({
-    onmessage: (res: any) => {
-      const data = receiveMessage(res);
-      //  todo....
-    },
-    onopen: (res: any) => {
-      window.socket.onclose = (res: any) => {
-        // 断线重连
-        console.log('断线重连')
-        connect();
-      }
-    },
-    socketUrl: import.meta.env.VITE_SOCKET_URL,
-  }).websocket;
-}
+const ws: any = new WebSocketClient({
+  heartTime: 60000,
+  onmessage: (res: any) => {
+    const data = res;
+    // todo
+  },
+  onopen: (res: any) => {
+    system.isWebSocket = true;
+  },
+  onclose: (res: any) => {
+    if(system.isWebSocket === true){
+      console.log(9999)
+      system.clearCardData()
+      router.push({ name: "home" });
+      system.setMessage("未识别到卡片信息")
+    }
+    system.isWebSocket = false;
+    ws.connect()
+  },
+  onerror: (error: any) => {
+    system.isWebSocket = false;
+    // system.clearCardData()
+    // 断线重连
+  },
+  onsend: (res: any) => {
+    console.log("send")
+  },
+  socketUrl: import.meta.env.VITE_SOCKET_URL,
+});
 
 const router = useRouter();
 

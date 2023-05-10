@@ -14,6 +14,7 @@ interface State {
       fullName?:string;
     };
   };
+  isWebSocket: boolean;
   message: Message;
   //数据字典
   dataDictionary:{
@@ -48,6 +49,7 @@ export const useMainStore = defineStore("main", {
   // state 是 store 的数据 (data)
   state: (): State => ({
     viewName: "", //页面名称
+    isWebSocket: false,
     //卡片信息
     card: cardInit(),
     //全局消息提示
