@@ -23,3 +23,15 @@ yarn or npm install
   ├── package.json
   └── vite.config.ts
 ```
+
+## 日志文件
+```
+Windows下：C:\Users\user_name\AppData\Roaming\its-platform-client\logs
+```
+
+## 生产环境开启调试模型
+```
+Control+Shift+O ：打开开发者工具
+Control+Shift+C ：关闭开发者工具
+Control+Shift+B ：关闭应用程序
+```

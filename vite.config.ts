@@ -89,7 +89,12 @@ export default defineConfig(({ command }) => {
       }
     },
     build: {
-      assetsDir:''
+      assetsDir:'',
+      terserOptions: {
+        compress: {
+          drop_console: true, // 移除 console 输出
+        },
+      },
     },
   }
 })

@@ -3,82 +3,35 @@
  * 主进程在 Node.js 环境中运行，这意味着它具有 require 模块和使用所有 Node.js API 的能力。
  */
 
-import { app, BrowserWindow, shell, ipcMain, Notification, dialog, session,nativeImage,crashReporter } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, Notification, dialog, session, nativeImage, crashReporter, globalShortcut } from 'electron'
 import { release } from 'node:os'
 import { join } from 'node:path'
-import * as ellog from "electron-log"
+import log from "electron-log"
 const path = require('path')
 
-const log:any = ellog
-// 50M
-log.transports.file.maxSize = 50 * 1024 * 1024;
-
-/**
- * 日志目录存储
- * mac： ~/Library/Application Support
- * windows: 搜索栏输入 %appdata%
- * 可使用的标签：
- *   log
-      error
-      warn
-      info
-      verbose
-      debug
-      silly
- */
-// setTimeout(() => {
-//   process.crash()
-// }, 10000);
-
-// ----------- 系统崩溃堆栈文件 start --------------
-// 获取奔溃堆栈文件存放路径
-let crashFilePath = '';
-let crashDumpsDir = '';
-try {
-  // electron 低版本
-  crashFilePath = path.join(app.getPath('temp'), app.getName() + ' Crashes');
-  // console.log('crash path:', crashFilePath); 
- 
-  // electron 高版本
-  crashDumpsDir = app.getPath('crashDumps');
-  // console.log('crashDumpsDir:', crashDumpsDir);
-} catch (e) {
-  console.error('获取奔溃文件路径失败', e);
-}
-// ----------- 系统崩溃堆栈文件 end --------------
 
 
-// ----------- 客户端日志 start --------------
-// global.log= log
+// ------------- electron-log 配置 start ----------------
+// 日志文件等级，默认值：false
+log.transports.file.level = 'info';
+// 日志控制台等级，默认值：false
+log.transports.console.level = 'debug';
+// 日志文件名，默认：main.log
+log.transports.file.fileName = 'main.log';
+// 日志格式，默认：[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}]{scope} {text}
+log.transports.file.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}]{scope} {text}';
+// 日志大小，默认：1048576（1M），达到最大上限后，备份文件并重命名为：main.old.log，有且仅有一个备份文件
+log.transports.file.maxSize = 1048576 * 50;
+// 日志文件位置：C:\Users\%USERPROFILE%\AppData\Roaming\【app——name】\logs
+// 完整的日志路径：log.transports.file.file，优先级高于 appName、fileName
 // Optional, initialize the logger for any renderer processses
-// log.initialize({ preload: true });
-
-// log.info('Log from the main process');
-// ----------- 客户端日志 end --------------
+log.initialize({ preload: true });
+// ------------- electron-log 配置 end ----------------
 
 
-// ------- 监听渲染进程和 GPU 进程奔溃事件 start ----------
-app.on('render-process-gone', (event, webContents, details) => {
-  // console.log('------')
-  // console.warn('app:render-process-gone', event, webContents, details);
-});
- 
-app.on('child-process-gone', (event, details) => {
-  // console.log('------')
-  // console.warn('app:child-process-gone', event, details);
-});
-// ------- 监听渲染进程和 GPU 进程奔溃事件 end ----------
 
-// The built directory structure
-//
-// ├─┬ dist-electron
-// │ ├─┬ main
-// │ │ └── index.js    > Electron-Main
-// │ └─┬ preload
-// │   └── index.js    > Preload-Scripts
-// ├─┬ dist
-// │ └── index.html    > Electron-Renderer
-//
+
+
 process.env.DIST_ELECTRON = join(__dirname, '..')
 process.env.DIST = join(process.env.DIST_ELECTRON, '../dist')
 process.env.PUBLIC = process.env.VITE_DEV_SERVER_URL
@@ -101,7 +54,7 @@ if (!app.requestSingleInstanceLock()) {
 // Read more on https://www.electronjs.org/docs/latest/tutorial/security
 // process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 
-let win:any = null
+let win: any = null
 // Here, you can also use other preload
 const preload = join(__dirname, '../preload/index.js')
 const url = process.env.VITE_DEV_SERVER_URL
@@ -116,17 +69,39 @@ async function handleFileOpen() {
   }
 }
 
+
+// 捕获未处理的异常和崩溃
+// process.on('uncaughtException', (error) => {
+//   log.warn('应用程序发生崩溃:' + error);
+//   // 在此处执行你的处理逻辑
+// });
+
+// 延迟30s 生成崩溃
+// setTimeout(() => {
+//   process.crash()
+// }, 30000)
+
+// ------- 监听渲染进程和 GPU 进程奔溃事件 start ----------
+app.on('render-process-gone', (event, webContents, details) => {
+  log.warn('渲染进程崩溃：' + details.reason)
+  // 重启
+  app.relaunch();
+  app.quit()
+});
+// ------- 监听渲染进程和 GPU 进程奔溃事件 end ----------
+
 function createWindow() {
   const emptyIcon = nativeImage.createEmpty()
   win = new BrowserWindow({
     title: 'Main window',
-    show: true,// 收否显示窗口
-    // fullscreen:true,
+    show: false,
+    fullscreen:false,//窗口是否处于全屏模式。
+    frame: false,//是否显示边框和标题栏
     width: 1280,
-    height:1024,
+    height: 1024,
     // icon: join(process.env.PUBLIC, 'favicon.ico'),
     // icon: emptyIcon,// 设置为空字符串
-    autoHideMenuBar: false,//置为 true 时，菜单栏会在窗口失去焦点时自动隐藏
+    autoHideMenuBar: true,// 窗口菜单栏是否自动隐藏
     webPreferences: {
       //预加载脚本可以在 BrowserWindow 构造方法中的 webPreferences 选项里被附加到主进程。
       preload,
@@ -137,6 +112,13 @@ function createWindow() {
     },
   })
 
+  // 生产环境开启全屏模式
+  if(import.meta.env.MODE === 'production'){
+    win.setFullScreen(true)
+  }
+
+  // win.setMenuBarVisibility(false);//菜单栏是否可见
+
   if (process.env.VITE_DEV_SERVER_URL) { // electron-vite-vue#298
     win.loadURL(url)
     // Open devTool if the app is not packaged
@@ -144,27 +126,55 @@ function createWindow() {
   } else {
     win.loadFile(indexHtml)
   }
-  
+
   // 解决窗口显示时有视觉闪烁
-  win.once('ready-to-show',()=>{
+  win.once('ready-to-show', () => {
     win.show()
     // setTimeout(()=>{
     //   win.loadFile(indexHtml)
     // },10000)
   })
 
+  // ----------- 系统崩溃堆栈文件 start --------------
+  // 获取奔溃堆栈文件存放路径
+  let crashFilePath = '';
+  let crashDumpsDir = '';
+  try {
+    // electron 低版本
+    crashFilePath = path.join(app.getPath('temp'), app.getName() + ' Crashes');
+    // console.log('crash path:', crashFilePath); 
+
+    // electron 高版本
+    crashDumpsDir = app.getPath('crashDumps');
+    // console.log('crashDumpsDir:', crashDumpsDir);
+  } catch (e) {
+    console.error('获取奔溃文件路径失败', e);
+  }
+
+  // ----------- 系统崩溃堆栈文件 end --------------
   //生产环境阻止窗口关闭
-  win.on('closed', (event:any) => {
-  //  event.preventDefault()
+  win.on('close', (event: any) => {
+    console.log(import.meta.env)
+    if (import.meta.env.NODE_ENV == 'production') {
+      // 阻止窗口关闭
+      event.preventDefault()
+      // 重新加载页面
+      log.warn('应用尝试关闭，已阻止')
+    }
   })
 
   // 网页未响应
-  win.on('unresponsive',(event:any)=>{
+  win.on('unresponsive', (event: any) => {
     // 重新加载页面
+    log.warn('网页无响应，重新加载：')
     const url = win.webContents.getURL()
     log.warn(`页面未响应：${url}`)
     // win.reload()
     win.loadFile(indexHtml)
+  })
+
+  win.on('closed', () => {
+    win = null;
   })
 
   // 进入开发者模式-显示菜单栏
@@ -176,7 +186,7 @@ function createWindow() {
   })
 
   // Make all links open with the browser, not with the application
-  win.webContents.setWindowOpenHandler((data:any) => {
+  win.webContents.setWindowOpenHandler((data: any) => {
     if (data.url.startsWith('https:')) shell.openExternal(data.url)
     return { action: 'deny' }
   })
@@ -185,7 +195,7 @@ function createWindow() {
   /**
    * IPC：渲染器进程到主进程（单向）
    */
-  ipcMain.on('open-web', (event:any, url:any) => {
+  ipcMain.on('open-web', (event: any, url: any) => {
     new Notification({ title: "网址", body: url }).show();
     const childWindow = new BrowserWindow({
       webPreferences: {
@@ -202,6 +212,39 @@ function createWindow() {
  * IPC：渲染器进程到主进程（双向）
  */
   ipcMain.handle('dialog:openFile', handleFileOpen)
+
+
+
+  // 注册全局快捷键
+  const ret = globalShortcut.register('Control+Shift+O', () => {
+    // 打开开发者工具
+    win.webContents.openDevTools();
+    // 设置窗口菜单栏是否自动隐藏
+    // win.setAutoHideMenuBar(false);
+    // 设置菜单栏是否可见
+    win.setMenuBarVisibility(true);
+  });
+
+  const ret1 = globalShortcut.register('Control+Shift+C', () => {
+    // 显示调试模式
+    win.webContents.closeDevTools();
+    // 设置窗口菜单栏是否自动隐藏
+    // win.setAutoHideMenuBar(true);
+    // 设置菜单栏是否可见
+    win.setMenuBarVisibility(false);
+  });
+
+  const ret2 = globalShortcut.register('Control+Shift+B', () => {
+    // 关闭应用
+    app.quit();
+  });
+
+  if (!ret && !ret1 && !ret2) {
+    log.warn('注册全局快捷键失败')
+  }
+
+  // 检测是否注册成功
+  // log.info('是否注册成功:', globalShortcut.isRegistered('CommandOrControl+Shift+A'));
 }
 
 app.whenReady().then(createWindow)
@@ -213,6 +256,12 @@ app.on('ready', () => {
   //   details.requestHeaders['Origin']='*'
   //   callback({cancel:false,requestHeaders:details.requestHeaders})
   // })
+  log.info('应用启动')
+})
+
+app.on('will-quit', () => {
+  // 解除全局快捷键的注册
+  globalShortcut.unregisterAll();
 })
 
 app.on('window-all-closed', () => {
