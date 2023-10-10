@@ -8,6 +8,8 @@
 /**
  * contextBridge 模块可以用来安全地从独立运行、上下文隔离的预加载脚本中暴露 API 给正在运行的渲染进程
  */
+
+// @ts-nocheck
 const { contextBridge, ipcRenderer } = require('electron')
 // const {app} = require('electron')
 // window.app = app
@@ -17,4 +19,58 @@ contextBridge.exposeInMainWorld('electronAPI', {
   exit: () => ipcRenderer.send('exit'),
   // IPC：渲染器进程到主进程（双向）
   openFile: () => ipcRenderer.invoke('dialog:openFile'),
+})
+
+const path = require('path');
+var dataFile = ''
+if (process.env.WEBPACK_DEV_SERVER_URL) {
+  dataFile = '../'
+} else {
+  dataFile = '../../'
+}
+const appPath = __dirname
+const rootPath = path.join(appPath, dataFile)
+const dbPath = path.join(rootPath, '/data/db.db')
+
+// 集成db模块
+const sq3 = require('sqlite3');
+const sqlite3 = sq3.verbose();
+var db = new sqlite3.Database(dbPath);
+
+const select = (sql) => {
+  return new Promise((resolve, reject) => {
+    db.all(sql, function(err, res) {
+      if (!err) {
+        resolve(res)
+      } else {
+        reject(err)
+      }
+    })
+  }, (reason) => {
+    reason(false)
+  })
+}
+var config = []
+select('select * from config').then(res => {
+  db.close()
+  // var sysConfig = {}
+  if (res && res.length > 0) {
+    config = res
+    // for (var i in res) {
+    //   sysConfig[res[i]['name']] = res[i]['value']
+    // }
+  }
+  // windows 全局对象
+  global.config = function(confName) {
+    for (var i in config) {
+      if (config[i].name === confName) {
+        return config[i]
+      }
+    }
+  }
+})
+process.once('loaded', () => {
+  global.appPath = appPath
+  global.rootPath = rootPath
+  global.dbPath = dbPath
 })
