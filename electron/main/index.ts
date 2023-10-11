@@ -107,8 +107,8 @@ function createWindow() {
       preload,
       webSecurity: false,//关闭web权限检查，允许跨域
       // Read more on https://www.electronjs.org/zh/blog/electron-4-0#webpreferences-default-values
-      nodeIntegration: false,//是否允许在渲染进程（即 Web 页面中）访问 Node.js 模块和 API
-      contextIsolation: true,//是否开启上下文隔离-开启后在渲染进程中无法直接访问 Node.js 模块和 API
+      // nodeIntegration: true,//是否允许在渲染进程（即 Web 页面中）访问 Node.js 模块和 API
+      // contextIsolation: true,//是否开启上下文隔离-开启后在渲染进程中无法直接访问 Node.js 模块和 API
     },
   })
 

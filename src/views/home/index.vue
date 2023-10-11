@@ -58,9 +58,9 @@ async function openFile() {
     filePath.value = await window.electronAPI.openFile()
 }
 
-rubbish({ name: "香蕉" }).then((res: any) => {
-    console.log(res)
-})
+// rubbish({ name: "香蕉" }).then((res: any) => {
+//     console.log(res)
+// })
 const route = useRoute();
 const router = useRouter();
 // console.log("00000")
@@ -83,10 +83,12 @@ const navs: Nav[] = [
     width: auto;
     height: auto;
 }
-.elbutton{
+
+.elbutton {
     padding: 20px;
     font-size: 35px;
 }
+
 .flex-center {
     display: flex;
     align-items: center;
