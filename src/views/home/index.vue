@@ -1,7 +1,8 @@
 <template>
     <div>
         <a href="https://www.electronjs.org/" target="_blank">
-            <img src="@/assets/images/icon/electron-logo.svg" class="logo electron" alt="Electron logo" />
+            <img style="opacity: 0.3;" src="@/assets/images/icon/electron-logo.svg" class="logo electron"
+                alt="Electron logo" />
         </a>
         <a href="https://vitejs.dev/" target="_blank">
             <img src="@/assets/images/icon/vite-logo.svg" class="logo" alt="Vite logo" />
@@ -25,7 +26,7 @@
     </div>
 </template>
   
-<script setup lang="ts">
+<script setup>
 import {
     defineComponent,
     reactive,
@@ -39,22 +40,21 @@ import {
 import tips from "@/components/tips.vue"
 import { useMainStore } from "@/stores/index"
 import { useRoute, useRouter } from "vue-router";
-import { receiveMessage } from '@/utils/websocket'
-import { rubbish } from "@/api/index"
+// import { rubbish } from "@/api/index"
 const system = useMainStore()
 system.viewName = "自助服务终端"
 
 // 设置基本数据类型时，使用 ref
-const filePath = ref<string>("")
-function navgiteto(key: string) {
+const filePath = ref("")
+function navgiteto (key) {
     router.push(key)
 }
 // 在新窗口打开网页
-function openWeb() {
+function openWeb () {
     window.electronAPI.openWeb("https://www.baidu.com")
 }
 // 选择文件，获取文件路径
-async function openFile() {
+async function openFile () {
     filePath.value = await window.electronAPI.openFile()
 }
 
@@ -63,13 +63,7 @@ async function openFile() {
 // })
 const route = useRoute();
 const router = useRouter();
-// console.log("00000")
-interface Nav {
-    key: string;
-    path: string;
-    displayName: string;
-}
-const navs: Nav[] = [
+const navs = [
     {
         key: "/elem-tmpl",
         path: "/elem-tmpl",

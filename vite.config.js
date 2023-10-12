@@ -20,8 +20,8 @@ export default defineConfig(({ command }) => {
       electron([
         {
           // Main-Process entry file of the Electron App.
-          entry: 'electron/main/index.ts',
-          onstart(options) {
+          entry: 'electron/main/index.js',
+          onstart (options) {
             if (process.env.VSCODE_DEBUG) {
               console.log(/* For `.vscode/.debug.script.mjs` */'[startup] Electron App')
             } else {
@@ -40,8 +40,8 @@ export default defineConfig(({ command }) => {
           },
         },
         {
-          entry: 'electron/preload/index.ts',
-          onstart(options) {
+          entry: 'electron/preload/index.js',
+          onstart (options) {
             // Notify the Renderer-Process to reload the page when the Preload-Scripts build is complete, 
             // instead of restarting the entire Electron App.
             options.reload()
@@ -62,9 +62,9 @@ export default defineConfig(({ command }) => {
       renderer(),
     ],
     // 别名配置
-    resolve:{
-      alias:{
-        '@':path.resolve(__dirname,'src')
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, 'src')
       }
     },
     server: process.env.VSCODE_DEBUG && (() => {
@@ -75,9 +75,9 @@ export default defineConfig(({ command }) => {
       }
     })(),
     clearScreen: false,
-    css:{
-      postcss:{
-        plugins:[
+    css: {
+      postcss: {
+        plugins: [
           pxtoviewport({
             viewportWidth: 1920,
             // viewportHeight: 667,
@@ -89,7 +89,7 @@ export default defineConfig(({ command }) => {
       }
     },
     build: {
-      assetsDir:'',
+      assetsDir: '',
       terserOptions: {
         compress: {
           drop_console: true, // 移除 console 输出

@@ -1,17 +1,17 @@
 <template>
     <div class="dialog">
         <el-dialog v-model="visible" :align-center="true" :show-close="false" :modal="true" width="40%"
-    :close-on-click-modal="false" :close-on-press-escape="false" :destroy-on-close="true">
-        <div class="content">
-            <div class="spinner"></div>
-            <span class="top-text margin_1" style="">{{ title }}</span>
-            <span class="tip-text margin_2" style="">{{ message }}</span>
-        </div>
-    </el-dialog>
+            :close-on-click-modal="false" :close-on-press-escape="false" :destroy-on-close="true">
+            <div class="content">
+                <div class="spinner"></div>
+                <span class="top-text margin_1" style="">{{ title }}</span>
+                <span class="tip-text margin_2" style="">{{ message }}</span>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
-<script setup lang="ts">
+<script setup >
 import {
     defineComponent,
     reactive,
@@ -25,7 +25,7 @@ const props = defineProps({
     title: String,
     message: String
 })
-const visible = ref<Boolean>(true)
+const visible = ref < Boolean > (true)
 </script>
 
 <style lang="less" scoped>
@@ -42,6 +42,7 @@ const visible = ref<Boolean>(true)
     -webkit-background-clip: text;
     // -webkit-text-fill-color: transparent;
 }
+
 .margin_1 {
     margin-top: 100px;
 }
@@ -51,41 +52,41 @@ const visible = ref<Boolean>(true)
     margin-bottom: 100px;
 }
 
-.dialog{
-    & :deep( .el-dialog ) {
-    width: 620px;
-    height: 640px;
-    background: #ffffff;
-    border-radius: 20px 20px 20px 20px;
-    opacity: 1;
+.dialog {
+    & :deep(.el-dialog) {
+        width: 620px;
+        height: 640px;
+        background: #ffffff;
+        border-radius: 20px 20px 20px 20px;
+        opacity: 1;
 
-    .el-dialog__header {
-        display: none;
-    }
+        .el-dialog__header {
+            display: none;
+        }
 
-    .el-dialog__body {
-        padding: 0;
-        height: 100%;
-    }
+        .el-dialog__body {
+            padding: 0;
+            height: 100%;
+        }
 
-    .content {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        padding-top: 100px;
-    }
+        .content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding-top: 100px;
+        }
 
-    .tip-text {
-        font-size: 26px;
-        font-family: Source Han Sans CN-Medium, Source Han Sans CN;
-        font-weight: 500;
-        color: #666666;
-        line-height: 0px;
-        -webkit-background-clip: text;
-        // -webkit-text-fill-color: transparent;
+        .tip-text {
+            font-size: 26px;
+            font-family: Source Han Sans CN-Medium, Source Han Sans CN;
+            font-weight: 500;
+            color: #666666;
+            line-height: 0px;
+            -webkit-background-clip: text;
+            // -webkit-text-fill-color: transparent;
+        }
     }
-}
 }
 
 

@@ -2,7 +2,7 @@
  * 生成一个用不重复的ID
  * @param { Number } randomLength
  */
-function getUUID(randomLength: number) {
+function getUUID (randomLength) {
   return Number(
     Math.random()
       .toString()

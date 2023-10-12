@@ -11,14 +11,14 @@ const { contextBridge, ipcRenderer } = require('electron')
 // window.app = app
 contextBridge.exposeInMainWorld('electronAPI', {
   // IPC：渲染器进程到主进程（单向）
-  openWeb: (url: string) => ipcRenderer.send('open-web', url),
+  openWeb: (url) => ipcRenderer.send('open-web', url),
   exit: () => ipcRenderer.send('exit'),
   // IPC：渲染器进程到主进程（双向）
   openFile: () => ipcRenderer.invoke('dialog:openFile'),
 })
 
 const path = require('path');
-console.log(path)
+// console.log(path)
 var dataFile = ''
 if (process.env.WEBPACK_DEV_SERVER_URL) {
   dataFile = '../'
@@ -36,7 +36,7 @@ var db = new sqlite3.Database(dbPath);
 
 const select = (sql) => {
   return new Promise((resolve, reject) => {
-    db.all(sql, function(err, res) {
+    db.all(sql, function (err, res) {
       if (!err) {
         resolve(res)
       } else {
@@ -58,7 +58,7 @@ select('select * from config').then(res => {
     // }
   }
   // windows 全局对象
-  global.config = function(confName) {
+  global.config = function (confName) {
     for (var i in config) {
       if (config[i].name === confName) {
         return config[i]

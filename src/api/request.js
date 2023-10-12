@@ -7,17 +7,17 @@ const service = axios.create({
 })
 // 请求拦截
 service.interceptors.request.use(
-    (config: any) => {
+    (config) => {
         return config
     },
-    (error: any) => {
+    (error) => {
         return Promise.reject(error)
     }
 )
- 
+
 // 响应拦截
 service.interceptors.response.use(
-    (response: any) => {
+    (response) => {
         const res = response.data
         if (res.code !== 1 || res.code !== 200) {
             return response.data
@@ -25,7 +25,7 @@ service.interceptors.response.use(
             return response.data
         }
     },
-    (error: any) => {
+    (error) => {
         if (error.response) {
             switch (error.response.status) {
                 case 500:
@@ -47,5 +47,5 @@ service.interceptors.response.use(
         }
     }
 )
- 
+
 export default service

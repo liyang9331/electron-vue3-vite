@@ -5,7 +5,7 @@
     </div>
 </template>
 
-<script setup lang="ts">
+<script setup >
 import {
     defineComponent,
     reactive,
@@ -29,7 +29,8 @@ const props = defineProps({
     background: #FFFFFF;
     border-radius: 20px 20px 20px 20px;
     opacity: 1;
-    img{
+
+    img {
         margin-left: 30px;
     }
 }

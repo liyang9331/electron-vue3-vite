@@ -1,23 +1,17 @@
 export default class WebSocketClient {
-  private handlerOptions: any;
-  private url: string;
-  private ws!: WebSocket;
-  private heartbeatIntervalId: any;
-  private reconnectIntervalId: any;
-  private HEARTBEAT_INTERVAL: number;//心跳包发送计时器:私有
-  private readonly RECONNECT_INTERVAL = 3000;//重连计时器:只读
-
-  constructor(handlerOptions: any) {
-    this.handlerOptions = handlerOptions;
-    this.url = handlerOptions.socketUrl;
+  constructor(opthios) {
+    this.handlerOptions = opthios;
+    this.url = opthios.socketUrl;
+    this.ws = null;
     this.heartbeatIntervalId = null;
     this.reconnectIntervalId = null;
-    this.HEARTBEAT_INTERVAL = handlerOptions.heartTime;
+    this.HEARTBEAT_INTERVAL = opthios.heartTime;
+    this.RECONNECT_INTERVAL = 3000;//重连计时器:只读
     this.connect();
   }
 
   // WebSocket 连接函数
-  private connect() {
+  connect () {
     this.ws = new WebSocket(this.url);
 
     this.ws.onopen = () => {
@@ -57,7 +51,7 @@ export default class WebSocketClient {
   }
 
   // 发送消息函数
-  public send(data: string | ArrayBuffer | Blob | ArrayBufferView) {
+  send (data) {
     if (this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(data);
     } else {
@@ -66,7 +60,7 @@ export default class WebSocketClient {
   }
 
   // 启动心跳定时器
-  private startHeartbeat() {
+  startHeartbeat () {
     this.heartbeatIntervalId = setInterval(() => {
       if (this.ws.readyState === WebSocket.OPEN) {
         // 发送心跳消息
@@ -76,12 +70,12 @@ export default class WebSocketClient {
   }
 
   // 停止心跳定时器
-  private stopHeartbeat() {
+  stopHeartbeat () {
     clearInterval(this.heartbeatIntervalId);
   }
 
   // 启动重连定时器
-  private startReconnect() {
+  startReconnect () {
     this.reconnectIntervalId = setInterval(() => {
       console.log('Reconnecting WebSocket...');
       this.connect();
@@ -89,12 +83,12 @@ export default class WebSocketClient {
   }
 
   // 停止重连定时器
-  private stopReconnect() {
+  stopReconnect () {
     clearInterval(this.reconnectIntervalId);
   }
 
   // 关闭 WebSocket 连接
-  public close() {
+  close () {
     this.ws.close();
   }
 }

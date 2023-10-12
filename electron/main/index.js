@@ -54,13 +54,13 @@ if (!app.requestSingleInstanceLock()) {
 // Read more on https://www.electronjs.org/docs/latest/tutorial/security
 // process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 
-let win: any = null
+let win = null
 // Here, you can also use other preload
 const preload = join(__dirname, '../preload/index.js')
 const url = process.env.VITE_DEV_SERVER_URL
 const indexHtml = join(process.env.DIST, 'index.html')
 
-async function handleFileOpen() {
+async function handleFileOpen () {
   const { canceled, filePaths } = await dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] });
   if (canceled) {
     return
@@ -90,13 +90,13 @@ app.on('render-process-gone', (event, webContents, details) => {
 });
 // ------- 监听渲染进程和 GPU 进程奔溃事件 end ----------
 
-function createWindow() {
+function createWindow () {
   const emptyIcon = nativeImage.createEmpty()
   win = new BrowserWindow({
     title: 'Main window',
     show: false,
-    fullscreen:false,//窗口是否处于全屏模式。
-    frame: false,//是否显示边框和标题栏
+    fullscreen: false,//窗口是否处于全屏模式。
+    frame: true,//是否显示边框和标题栏
     width: 1280,
     height: 1024,
     // icon: join(process.env.PUBLIC, 'favicon.ico'),
@@ -113,7 +113,7 @@ function createWindow() {
   })
 
   // 生产环境开启全屏模式
-  if(import.meta.env.MODE === 'production'){
+  if (import.meta.env.MODE === 'production') {
     win.setFullScreen(true)
   }
 
@@ -153,7 +153,7 @@ function createWindow() {
 
   // ----------- 系统崩溃堆栈文件 end --------------
   //生产环境阻止窗口关闭
-  win.on('close', (event: any) => {
+  win.on('close', (event) => {
     console.log(import.meta.env)
     if (import.meta.env.NODE_ENV == 'production') {
       // 阻止窗口关闭
@@ -164,7 +164,7 @@ function createWindow() {
   })
 
   // 网页未响应
-  win.on('unresponsive', (event: any) => {
+  win.on('unresponsive', (event) => {
     // 重新加载页面
     log.warn('网页无响应，重新加载：')
     const url = win.webContents.getURL()
@@ -186,7 +186,7 @@ function createWindow() {
   })
 
   // Make all links open with the browser, not with the application
-  win.webContents.setWindowOpenHandler((data: any) => {
+  win.webContents.setWindowOpenHandler((data) => {
     if (data.url.startsWith('https:')) shell.openExternal(data.url)
     return { action: 'deny' }
   })
@@ -195,7 +195,7 @@ function createWindow() {
   /**
    * IPC：渲染器进程到主进程（单向）
    */
-  ipcMain.on('open-web', (event: any, url: any) => {
+  ipcMain.on('open-web', (event, url) => {
     new Notification({ title: "网址", body: url }).show();
     const childWindow = new BrowserWindow({
       webPreferences: {

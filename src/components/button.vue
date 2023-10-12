@@ -4,7 +4,7 @@
     </div>
 </template>
 
-<script setup lang="ts">
+<script setup >
 import {
     defineProps, defineEmits, ref
 } from "vue";
@@ -23,13 +23,12 @@ const props = defineProps({
     },
 })
 const emit = defineEmits(['handler'])
-function clickHandler() {
+function clickHandler () {
     emit('handler', {})
 }
 </script>
 
 <style scoped lang="less">
-
 .btn-text {
     font-size: 34px;
     // font-size: 34px;
@@ -59,13 +58,17 @@ function clickHandler() {
     box-shadow: 0px 3px 12px 1px rgba(0, 0, 0, 0.08);
     border-radius: 20px 20px 20px 20px;
     border: 2px solid #318800;
-    &:checked,&:active {
-        &>span{
+
+    &:checked,
+    &:active {
+        &>span {
             color: #409eff;
         }
+
         border: 2px solid #c6e2ff;
     }
 }
+
 .btn {
     cursor: pointer;
     display: flex;
@@ -78,11 +81,12 @@ function clickHandler() {
     border-radius: 20px 20px 20px 20px;
     border: 2px solid #318800;
 
-    &:checked,&:active {
-        &>span{
+    &:checked,
+    &:active {
+        &>span {
             color: #409eff;
         }
+
         border: 2px solid #c6e2ff;
     }
-}
-</style>
+}</style>

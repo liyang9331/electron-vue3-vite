@@ -2,42 +2,42 @@
 <template>
   <div class="content">
     <div class="layout">
-    <span class="title">{{ system.viewName }}</span>
-    <div class="right">
-      <div>
-        <p class="date">{{ week }}</p>
-        <p class="date">{{ date }}</p>
+      <span class="title">{{ system.viewName }}</span>
+      <div class="right">
+        <div>
+          <p class="date">{{ week }}</p>
+          <p class="date">{{ date }}</p>
+        </div>
+        <span class="time">{{ time }}</span>
+        <img v-if="isShow" style="cursor: pointer;" @click="click()" src="../assets/images/home.png">
       </div>
-      <span class="time">{{ time }}</span>
-      <img v-if="isShow" style="cursor: pointer;" @click="click()" src="../assets/images/home.png">
     </div>
-  </div>
-  <div class="lines"></div>
+    <div class="lines"></div>
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, onBeforeUnmount,getCurrentInstance,watch} from 'vue'
-import {useRoute} from 'vue-router';
+<script setup >
+import { ref, onBeforeUnmount, getCurrentInstance, watch } from 'vue'
+import { useRoute } from 'vue-router';
 import dayjs from 'dayjs';
 import { useMainStore } from '@/stores/index'
 
 const route = useRoute();
 // 监听路由变化
 watch(
-  ()=>route.name,
-  (newVal:any,oldVal:any)=>{
-    if(newVal!='home' && newVal!=undefined){
-      isShow.value=true;
-    }else{
-      isShow.value=false;
+  () => route.name,
+  (newVal, oldVal) => {
+    if (newVal != 'home' && newVal != undefined) {
+      isShow.value = true;
+    } else {
+      isShow.value = false;
     }
   }
 )
 
-const {emit}:any = getCurrentInstance();
+const { emit } = getCurrentInstance();
 const system = useMainStore()
-const isShow = ref<boolean>(false)
+const isShow = ref < boolean > (false)
 // window.stores = {system}
 // let viewName = ref<string>(system.viewName)
 // 订阅state[组件被卸载后，订阅将被自动删除]
@@ -47,27 +47,27 @@ const isShow = ref<boolean>(false)
 // 订阅state【组件被卸载后，订阅依旧保留】
 // system.$subscribe(()=>{},{detached:true})
 
-let date = ref<string>(dayjs().format('YYYY-MM-DD'))
+let date = ref < string > (dayjs().format('YYYY-MM-DD'))
 const list = [{ key: 0, val: "星期天" }, { key: 1, val: "星期一" }, { key: 2, val: "星期二" }, { key: 3, val: "星期三" }, { key: 4, val: "星期四" }, { key: 5, val: "星期五" }, { key: 6, val: "星期六" },]
-const week = ref<any>("")
-const time = ref<string>("")
-let setval = ref<any>(null)
-const publicMsg = ref<string>("未识别到IC/射频卡信息")
+const week = ref < any > ("")
+const time = ref < string > ("")
+let setval = ref < any > (null)
+const publicMsg = ref < string > ("未识别到IC/射频卡信息")
 
-function init() {
+function init () {
   getDateTime()
   setval.value = setInterval(() => {
     getDateTime()
   }, 50000)
 }
 
-function getDateTime() {
+function getDateTime () {
   week.value = list.find(item => item.key == dayjs().day())?.val
   time.value = dayjs().format('HH:mm')
 }
 
-function click() {
-  emit('clickHandler',{})
+function click () {
+  emit('clickHandler', {})
 }
 init()
 
@@ -81,9 +81,11 @@ img {
   width: 60px;
   height: 60px;
 }
-.content{
+
+.content {
   height: 116px;
 }
+
 .layout {
   // padding: 30px;
   height: 110px;
@@ -101,6 +103,7 @@ img {
   justify-content: right;
   align-items: center;
   margin-right: 30px;
+
   &>div {
     margin-right: 18px;
   }
@@ -147,5 +150,4 @@ img {
   border-radius: 0px 0px 0px 0px;
   opacity: 1;
 }
-
 </style>

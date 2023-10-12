@@ -1,25 +1,25 @@
-<script setup lang="ts">
-import {Ref,ref,reactive} from "vue"
+<script setup >
+import { Ref, ref, reactive } from "vue"
 import HelloWorld from '@/components/layout-top.vue.js'
 import { useRouter } from "vue-router";
-import {rubbish} from "@/api/index"
+import { rubbish } from "@/api/index"
 const router = useRouter()
 
 // 设置基本数据类型时，使用 ref
-const filePath=ref<string>("")
-function navgiteto(key:string){
+const filePath = ref < string > ("")
+function navgiteto (key) {
   router.push(key)
 }
 // 在新窗口打开网页
-function openWeb(){
-    window.electronAPI.openWeb("https://www.baidu.com")
+function openWeb () {
+  window.electronAPI.openWeb("https://www.baidu.com")
 }
 // 选择文件，获取文件路径
-async function openFile(){
+async function openFile () {
   filePath.value = await window.electronAPI.openFile()
 }
 
-rubbish({name:"香蕉"}).then((res:any)=>{
+rubbish({ name: "香蕉" }).then((res) => {
   console.log(res)
 })
 </script>

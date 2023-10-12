@@ -1,4 +1,4 @@
-// main.ts
+// main.js
 
 // 引入 vue 实例化函数
 import { createApp } from "vue";

@@ -1,7 +1,8 @@
 <template>
     <div class="eldialog">
         <el-dialog align-center center v-model="system.message.visible" :show-close="false" :modal="true" width="40%"
-            :before-close="handleClose" :close-on-click-modal="false" :close-on-press-escape="false" :destroy-on-close="true">
+            :before-close="handleClose" :close-on-click-modal="false" :close-on-press-escape="false"
+            :destroy-on-close="true">
             <div class="content">
                 <!-- <div class="spinner"></div> -->
                 <span class="top-text margin_1" style="">{{ system.message.title }}</span>
@@ -11,18 +12,18 @@
     </div>
 </template>
 
-<script setup lang="ts">
+<script setup >
 import { ref } from "vue"
 import { useMainStore } from "@/stores/index"
 const system = useMainStore()
 
-function handleClose() {
+function handleClose () {
 
 }
 
-setTimeout(()=>{
+setTimeout(() => {
     system.message.visible = false
-},2000)
+}, 2000)
 </script>
 
 <style lang="less" scoped>
